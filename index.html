@@ -1,689 +1,1724 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="am">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Stock Ledger</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<meta name="theme-color" content="#0f766e">
+
+<title>የክምችት መዝገብ</title>
+
 <style>
-  :root{
-    --bg:#0f1424;
-    --surface:#181f3a;
-    --surface-alt:#1f2848;
-    --border:#2b3462;
-    --text:#f1f3fb;
-    --muted:#8b93b8;
-    --muted-dim:#5d6690;
-    --gold:#cda05f;
-    --gold-dim:#8a7040;
-    --green:#5fb08a;
-    --red:#c1664a;
-    --radius:3px;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter',sans-serif;
-    font-variant-numeric:tabular-nums;
-    -webkit-font-smoothing:antialiased;
-    padding-bottom:78px;
-    min-height:100vh;
-  }
-  .app-header{
-    padding:28px 20px 18px;
-    border-bottom:1px solid var(--border);
-    background:linear-gradient(180deg,#141a34,#0f1424);
-  }
-  .app-header h1{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:26px;
-    margin:0;
-    letter-spacing:0.2px;
-  }
-  .app-header .sub{
-    color:var(--muted);
-    font-size:13px;
-    margin-top:4px;
-  }
-  main{padding:18px 16px 20px; max-width:640px; margin:0 auto;}
-  .view{display:none;}
-  .view.active{display:block; animation:fadein .25s ease;}
-  @keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+* {
+    box-sizing: border-box;
+}
 
-  /* Dashboard */
-  .stat-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;}
-  .stat-card{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:14px 14px 12px;
-  }
-  .stat-card .label{font-size:11.5px; color:var(--muted); margin-bottom:6px;}
-  .stat-card .value{font-family:'Fraunces',serif; font-size:21px; font-weight:600;}
-  .stat-card .value.green{color:var(--green);}
-  .stat-card .value.gold{color:var(--gold);}
-  .stat-card .value.red{color:var(--red);}
-  .section-title{
-    font-family:'Fraunces',serif;
-    font-size:15px;
-    color:var(--gold);
-    margin:26px 0 10px;
-    display:flex; align-items:baseline; justify-content:space-between;
-  }
-  .section-title span.tag{font-family:'Inter',sans-serif; font-size:11px; color:var(--muted-dim);}
-  .ledger-table{width:100%; border-collapse:collapse;}
-  .ledger-table th{
-    text-align:left; font-size:10.5px; color:var(--muted-dim);
-    font-weight:600; padding:0 8px 6px 0; border-bottom:1px solid var(--border);
-    text-transform:none;
-  }
-  .ledger-table td{
-    padding:9px 8px 9px 0; border-bottom:1px solid #1c2444; font-size:13.5px;
-  }
-  .ledger-table td.num, .ledger-table th.num{text-align:right;}
-  .ledger-table tr:last-child td{border-bottom:none;}
-  .muted{color:var(--muted);}
-  .pill{
-    display:inline-block; font-size:10.5px; padding:2px 7px; border-radius:20px;
-    border:1px solid var(--border); color:var(--muted);
-  }
-  .pill.credit{color:var(--red); border-color:#4a2e2b;}
-  .pill.paid{color:var(--green); border-color:#2b4a3d;}
-  .empty-note{
-    color:var(--muted-dim); font-size:13px; padding:20px 0; text-align:center;
-    border:1px dashed var(--border); border-radius:var(--radius); margin-top:8px;
-  }
+body {
+    margin: 0;
+    font-family: Arial, "Noto Sans Ethiopic", sans-serif;
+    background: #f5f7f8;
+    color: #17202a;
+}
 
-  /* Forms */
-  .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px;}
-  .field{margin-bottom:13px;}
-  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px;}
-  .field input, .field select{
-    width:100%; background:var(--surface-alt); border:1px solid var(--border);
-    color:var(--text); padding:10px 11px; border-radius:var(--radius); font-size:14.5px;
-    font-family:'Inter',sans-serif;
-  }
-  .field input:focus, .field select:focus{outline:none; border-color:var(--gold-dim);}
-  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .computed-line{
-    display:flex; justify-content:space-between; font-size:13px; color:var(--muted);
-    padding:6px 0; border-top:1px dashed var(--border); margin-top:4px;
-  }
-  .computed-line strong{color:var(--text); font-weight:600;}
-  button.primary{
-    width:100%; background:var(--gold); color:#231a0d; border:none; padding:12px;
-    border-radius:var(--radius); font-size:14.5px; font-weight:600; margin-top:6px;
-    font-family:'Inter',sans-serif; cursor:pointer;
-  }
-  button.primary:active{background:var(--gold-dim);}
-  button.ghost{
-    width:100%; background:transparent; color:var(--muted); border:1px solid var(--border);
-    padding:10px; border-radius:var(--radius); font-size:13px; margin-top:8px; cursor:pointer;
-  }
-  button.small{
-    background:transparent; border:1px solid var(--border); color:var(--muted);
-    padding:5px 10px; border-radius:var(--radius); font-size:12px; cursor:pointer;
-  }
-  .row-actions{display:flex; gap:6px;}
-  select#creditPaymentSale, select#saleItem, select#purchaseItem{appearance:none;}
+button,
+input,
+select {
+    font: inherit;
+}
 
-  /* Bottom nav */
-  nav.tabbar{
-    position:fixed; bottom:0; left:0; right:0; background:#121732;
-    border-top:1px solid var(--border); display:flex; z-index:10;
-  }
-  nav.tabbar button{
-    flex:1; background:none; border:none; color:var(--muted-dim); padding:10px 2px 9px;
-    font-family:'Inter',sans-serif; font-size:10.5px; cursor:pointer;
-  }
-  nav.tabbar button .ico{display:block; font-size:16px; margin-bottom:3px; font-family:'Fraunces',serif;}
-  nav.tabbar button.active{color:var(--gold);}
+button {
+    cursor: pointer;
+}
 
-  .item-row{
-    display:flex; justify-content:space-between; align-items:center;
-    padding:11px 0; border-bottom:1px solid #1c2444;
-  }
-  .item-row:last-child{border-bottom:none;}
-  .item-row .name{font-size:14px;}
-  .item-row .meta{font-size:12px; color:var(--muted); margin-top:2px;}
-  .item-row .stockval{text-align:right; font-size:13.5px;}
-  .item-row .stockval .v{color:var(--muted); font-size:11.5px;}
+.hidden {
+    display: none !important;
+}
 
-  .modal-backdrop{
-    display:none; position:fixed; inset:0; background:rgba(6,8,18,.7); z-index:20;
-    align-items:flex-end; justify-content:center;
-  }
-  .modal-backdrop.active{display:flex;}
-  .modal{
-    background:var(--surface); border:1px solid var(--border); border-radius:10px 10px 0 0;
-    padding:18px 16px 22px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto;
-  }
-  .modal h3{font-family:'Fraunces',serif; font-weight:600; font-size:17px; margin:0 0 14px;}
-  .link-btn{background:none;border:none;color:var(--gold);font-size:12.5px;cursor:pointer;padding:0;}
-  .top-actions{display:flex; justify-content:flex-end; margin-bottom:8px;}
+/* LOGIN */
+
+#loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #0f766e, #115e59);
+}
+
+.login-box {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.2);
+}
+
+.login-logo {
+    text-align: center;
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.login-box h1 {
+    text-align: center;
+    margin: 0 0 8px;
+}
+
+.login-box p {
+    text-align: center;
+    color: #667085;
+    margin-bottom: 25px;
+}
+
+.field {
+    margin-bottom: 15px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d0d5dd;
+    border-radius: 10px;
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: #0f766e;
+}
+
+.primary-btn {
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    padding: 14px;
+    background: #0f766e;
+    color: white;
+    font-weight: bold;
+}
+
+.primary-btn:hover {
+    background: #115e59;
+}
+
+.error {
+    color: #b42318;
+    background: #fef3f2;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* APP */
+
+#app {
+    min-height: 100vh;
+}
+
+header {
+    background: #0f766e;
+    color: white;
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.header-inner {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.header-user {
+    font-size: 12px;
+    opacity: .9;
+}
+
+.logout-btn {
+    border: 1px solid rgba(255,255,255,.5);
+    background: transparent;
+    color: white;
+    padding: 7px 10px;
+    border-radius: 8px;
+}
+
+main {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px 15px 100px;
+}
+
+.role-box {
+    background: white;
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.role-owner {
+    color: #067647;
+    font-weight: bold;
+}
+
+.role-employee {
+    color: #475467;
+    font-weight: bold;
+}
+
+/* DASHBOARD */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: white;
+    border-radius: 14px;
+    padding: 17px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.stat small {
+    color: #667085;
+}
+
+.stat strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 22px;
+}
+
+/* VIEWS */
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.card h2,
+.card h3 {
+    margin-top: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 14px;
+    background: #0f766e;
+    color: white;
+    font-weight: 600;
+}
+
+.btn.secondary {
+    background: #475467;
+}
+
+.btn.danger {
+    background: #b42318;
+}
+
+.btn.light {
+    background: #e6fffb;
+    color: #0f766e;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 11px 8px;
+    border-bottom: 1px solid #eaecf0;
+    white-space: nowrap;
+}
+
+th {
+    color: #475467;
+    font-size: 13px;
+}
+
+/* NAV */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 68px;
+    background: white;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    z-index: 100;
+}
+
+.nav-inner {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    overflow-x: auto;
+}
+
+.nav-btn {
+    flex: 1;
+    min-width: 80px;
+    border: 0;
+    background: white;
+    color: #667085;
+    padding: 8px 4px;
+}
+
+.nav-btn.active {
+    color: #0f766e;
+    font-weight: bold;
+}
+
+.nav-icon {
+    display: block;
+    font-size: 20px;
+}
+
+/* STATUS */
+
+#syncStatus {
+    position: fixed;
+    top: 75px;
+    right: 12px;
+    z-index: 90;
+    background: #067647;
+    color: white;
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+#syncStatus.offline {
+    background: #b54708;
+}
+
+/* MODAL */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    z-index: 200;
+}
+
+.modal-box {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal-actions button {
+    flex: 1;
+}
+
+/* MOBILE */
+
+@media(max-width: 700px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid,
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .header-user {
+        display: none;
+    }
+
+    main {
+        padding-top: 15px;
+    }
+}
+
+@media(max-width: 400px) {
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .stat strong {
+        font-size: 18px;
+    }
+}
 </style>
 </head>
+
 <body>
 
-<div class="app-header">
-  <h1>Stock Ledger</h1>
-  <div class="sub">Purchases · Sales · Credit · Profit</div>
+<!-- ================= LOGIN ================= -->
+
+<div id="loginScreen">
+
+    <div class="login-box">
+
+        <div class="login-logo">📒</div>
+
+        <h1>የክምችት መዝገብ</h1>
+
+        <p>የንግድ እና የክምችት አስተዳደር</p>
+
+        <div id="loginError" class="error hidden"></div>
+
+        <div class="field">
+            <label>ኢሜይል</label>
+            <input
+                id="loginEmail"
+                type="email"
+                placeholder="example@email.com"
+                autocomplete="email">
+        </div>
+
+        <div class="field">
+            <label>የይለፍ ቃል</label>
+            <input
+                id="loginPassword"
+                type="password"
+                placeholder="Password"
+                autocomplete="current-password">
+        </div>
+
+        <button
+            id="loginBtn"
+            class="primary-btn">
+            ግባ
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= APPLICATION ================= -->
+
+<div id="app" class="hidden">
+
+<header>
+
+    <div class="header-inner">
+
+        <div>
+            <div class="header-title">
+                📒 የክምችት መዝገብ
+            </div>
+
+            <div
+                id="userRoleText"
+                class="header-user">
+            </div>
+        </div>
+
+        <button
+            id="logoutBtn"
+            class="logout-btn">
+            ውጣ
+        </button>
+
+    </div>
+
+</header>
+
+<div id="syncStatus">
+    ☁️ እየተመሳሰለ...
 </div>
 
 <main>
 
-  <!-- DASHBOARD -->
-  <section class="view active" id="view-dashboard">
-    <div class="section-title">This month<span class="tag" id="monthLabel"></span></div>
-    <div class="stat-row">
-      <div class="stat-card"><div class="label">Sales revenue</div><div class="value" id="mSales">0</div></div>
-      <div class="stat-card"><div class="label">Profit</div><div class="value green" id="mProfit">0</div></div>
-      <div class="stat-card"><div class="label">Purchases</div><div class="value" id="mPurchases">0</div></div>
-      <div class="stat-card"><div class="label">Margin</div><div class="value gold" id="mMargin">0%</div></div>
+<div class="role-box">
+
+    <div>
+        የመግቢያ ሚና:
+        <span id="roleLabel"></span>
     </div>
 
-    <div class="section-title">All time</div>
-    <div class="stat-row">
-      <div class="stat-card"><div class="label">Total sales</div><div class="value" id="tSales">0</div></div>
-      <div class="stat-card"><div class="label">Total profit</div><div class="value green" id="tProfit">0</div></div>
-      <div class="stat-card"><div class="label">Total purchases</div><div class="value" id="tPurchases">0</div></div>
-      <div class="stat-card"><div class="label">Outstanding credit</div><div class="value red" id="tCredit">0</div></div>
+    <div id="readOnlyMessage" class="hidden">
+        👁️ ማየት ብቻ
     </div>
 
-    <div class="section-title">Remaining stock<span class="tag" id="stockValueTag"></span></div>
-    <div id="stockList"></div>
+</div>
 
-  </section>
 
-  <!-- PURCHASES -->
-  <section class="view" id="view-purchases">
-    <div class="card">
-      <div class="field">
-        <label>Item</label>
-        <select id="purchaseItem"></select>
-      </div>
-      <div class="field-row">
-        <div class="field"><label>Quantity</label><input type="number" id="purchaseQty" step="any" placeholder="0"></div>
-        <div class="field"><label>Cost per unit</label><input type="number" id="purchaseCost" step="any" placeholder="0"></div>
-      </div>
-      <div class="field"><label>Date</label><input type="date" id="purchaseDate"></div>
-      <div class="computed-line"><span>Total cost</span><strong id="purchaseTotalPreview">0</strong></div>
-      <button class="primary" onclick="addPurchase()">Record purchase</button>
-    </div>
+<!-- ================= DASHBOARD ================= -->
 
-    <div class="section-title">History</div>
-    <div id="purchaseList"></div>
-  </section>
+<section id="dashboardView" class="view active">
 
-  <!-- SALES -->
-  <section class="view" id="view-sales">
-    <div class="card">
-      <div class="field">
-        <label>Item</label>
-        <select id="saleItem" onchange="refreshSalePreview()"></select>
-      </div>
-      <div class="field-row">
-        <div class="field"><label>Quantity</label><input type="number" id="saleQty" step="any" placeholder="0" oninput="refreshSalePreview()"></div>
-        <div class="field"><label>Sale price / unit</label><input type="number" id="salePrice" step="any" placeholder="0" oninput="refreshSalePreview()"></div>
-      </div>
-      <div class="field"><label>Date</label><input type="date" id="saleDate"></div>
+    <h2>ዳሽቦርድ</h2>
 
-      <div class="field">
-        <label>Payment</label>
-        <select id="salePayment" onchange="togglePaidField()">
-          <option value="full">Paid in full</option>
-          <option value="credit">Credit (customer owes)</option>
-        </select>
-      </div>
-      <div id="creditFields" style="display:none;">
-        <div class="field"><label>Customer name</label><input type="text" id="saleCustomer" placeholder="Name"></div>
-        <div class="field"><label>Amount paid now</label><input type="number" id="saleAmountPaid" step="any" placeholder="0" oninput="refreshSalePreview()"></div>
-      </div>
+    <div class="stats">
 
-      <div class="computed-line"><span>Revenue</span><strong id="previewRevenue">0</strong></div>
-      <div class="computed-line"><span>Cost of goods</span><strong id="previewCogs">0</strong></div>
-      <div class="computed-line"><span>Profit</span><strong id="previewProfit">0</strong></div>
-      <div class="computed-line"><span>Margin</span><strong id="previewMargin">0%</strong></div>
-      <div class="computed-line" id="previewBalanceLine" style="display:none;"><span>Balance owed</span><strong id="previewBalance">0</strong></div>
-
-      <button class="primary" onclick="addSale()">Record sale</button>
-    </div>
-
-    <div class="section-title">History</div>
-    <div id="saleList"></div>
-  </section>
-
-  <!-- CREDIT -->
-  <section class="view" id="view-credit">
-    <div class="section-title">Outstanding balances<span class="tag" id="creditTotalTag"></span></div>
-    <div id="creditList"></div>
-  </section>
-
-  <!-- ITEMS -->
-  <section class="view" id="view-items">
-    <div class="card">
-      <div class="field"><label>Item name</label><input type="text" id="newItemName" placeholder="e.g. PVC pipe 4-inch, Cement, Ceramic tile 60x60"></div>
-      <div class="field-row">
-        <div class="field">
-          <label>Unit</label>
-          <select id="newItemUnit">
-            <option value="pieces">pieces</option>
-            <option value="bags">bags</option>
-            <option value="kg">kg</option>
-            <option value="meters">meters</option>
-            <option value="sqm">sqm</option>
-            <option value="liters">liters</option>
-            <option value="boxes">boxes</option>
-            <option value="rolls">rolls</option>
-          </select>
+        <div class="stat">
+            <small>የእቃ ብዛት</small>
+            <strong id="statItems">0</strong>
         </div>
-        <div class="field"><label>Opening stock</label><input type="number" id="newItemQty" step="any" placeholder="0"></div>
-      </div>
-      <div class="field"><label>Opening cost per unit</label><input type="number" id="newItemCost" step="any" placeholder="0"></div>
-      <button class="primary" onclick="addItem()">Add item</button>
-    </div>
-    <div class="section-title">Items</div>
-    <div id="itemsList"></div>
 
-    <div class="section-title">Data</div>
-    <button class="ghost" onclick="exportData()">Export backup (.json)</button>
-    <button class="ghost" onclick="document.getElementById('importFile').click()">Import backup</button>
-    <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
-  </section>
+        <div class="stat">
+            <small>የክምችት ብዛት</small>
+            <strong id="statStock">0</strong>
+        </div>
+
+        <div class="stat owner-only">
+            <small>የሽያጭ ገቢ</small>
+            <strong id="statSales">0</strong>
+        </div>
+
+        <div class="stat owner-only">
+            <small>ትርፍ</small>
+            <strong id="statProfit">0</strong>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>የእቃ ክምችት</h3>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>እቃ</th>
+                        <th>መለኪያ</th>
+                        <th>ብዛት</th>
+                        <th class="owner-only">የግዢ ዋጋ</th>
+                    </tr>
+                </thead>
+
+                <tbody id="dashboardItems"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= PURCHASES ================= -->
+
+<section id="purchasesView" class="view owner-view">
+
+    <h2>ግዢ</h2>
+
+    <div class="card">
+
+        <h3>አዲስ ግዢ</h3>
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>እቃ</label>
+
+                <select id="purchaseItem"></select>
+
+            </div>
+
+            <div class="field">
+
+                <label>ብዛት</label>
+
+                <input
+                    id="purchaseQty"
+                    type="number"
+                    min="1">
+            </div>
+
+            <div class="field">
+
+                <label>የአንዱ ዋጋ</label>
+
+                <input
+                    id="purchaseCost"
+                    type="number"
+                    min="0"
+                    step="0.01">
+            </div>
+
+            <div class="field">
+
+                <label>ቀን</label>
+
+                <input
+                    id="purchaseDate"
+                    type="date">
+            </div>
+
+        </div>
+
+        <button
+            class="btn"
+            id="addPurchaseBtn">
+            + ግዢ መዝግብ
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>የግዢ ታሪክ</h3>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ቀን</th>
+                        <th>እቃ</th>
+                        <th>ብዛት</th>
+                        <th>ዋጋ</th>
+                        <th>ጠቅላላ</th>
+                    </tr>
+                </thead>
+
+                <tbody id="purchaseHistory"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= SALES ================= -->
+
+<section id="salesView" class="view">
+
+    <h2>ሽያጭ</h2>
+
+    <div class="card owner-editable">
+
+        <h3>አዲስ ሽያጭ</h3>
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>እቃ</label>
+
+                <select id="saleItem"></select>
+
+            </div>
+
+            <div class="field">
+
+                <label>ብዛት</label>
+
+                <input
+                    id="saleQty"
+                    type="number"
+                    min="1"
+                    value="1">
+
+            </div>
+
+            <div class="field">
+
+                <label>የአንዱ የሽያጭ ዋጋ</label>
+
+                <input
+                    id="salePrice"
+                    type="number"
+                    min="0"
+                    step="0.01">
+
+            </div>
+
+            <div class="field">
+
+                <label>የክፍያ አይነት</label>
+
+                <select id="salePayment">
+
+                    <option value="cash">ጥሬ ገንዘብ</option>
+
+                    <option value="credit">በዱቤ</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <button
+            class="btn"
+            id="addSaleBtn">
+            + ሽያጭ መዝግብ
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>የሽያጭ ታሪክ</h3>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ቀን</th>
+                        <th>እቃ</th>
+                        <th>ብዛት</th>
+                        <th>ገቢ</th>
+                        <th>ክፍያ</th>
+                        <th class="owner-only">ትርፍ</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="salesHistory"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CREDIT ================= -->
+
+<section id="creditView" class="view">
+
+    <h2>ዱቤ</h2>
+
+    <div class="card">
+
+        <h3>የዱቤ ሽያጭ</h3>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ቀን</th>
+                        <th>እቃ</th>
+                        <th>ገቢ</th>
+                        <th>የተከፈለ</th>
+                        <th>ቀሪ</th>
+                        <th>እርምጃ</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="creditHistory"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= ITEMS ================= -->
+
+<section id="itemsView" class="view owner-view">
+
+    <h2>እቃዎች</h2>
+
+    <div class="card">
+
+        <h3>አዲስ እቃ ጨምር</h3>
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>የእቃ ስም</label>
+
+                <input
+                    id="itemName"
+                    placeholder="ምሳሌ: ስኳር">
+
+            </div>
+
+            <div class="field">
+
+                <label>መለኪያ</label>
+
+                <input
+                    id="itemUnit"
+                    placeholder="kg / pcs / box">
+
+            </div>
+
+        </div>
+
+        <button
+            class="btn"
+            id="addItemBtn">
+            + እቃ ጨምር
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>የእቃ ዝርዝር</h3>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>እቃ</th>
+                        <th>መለኪያ</th>
+                        <th>ብዛት</th>
+                        <th>እርምጃ</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="itemsTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= BACKUP ================= -->
+
+<section id="backupView" class="view owner-view">
+
+    <h2>Backup / Restore</h2>
+
+    <div class="card">
+
+        <h3>የዳታ ምትኬ</h3>
+
+        <p>
+            የመተግበሪያውን ዳታ JSON ፋይል አድርገው ያስቀምጡ።
+        </p>
+
+        <button
+            class="btn"
+            id="exportBtn">
+            ⬇️ JSON Backup
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Restore</h3>
+
+        <input
+            id="importFile"
+            type="file"
+            accept=".json">
+
+        <br><br>
+
+        <button
+            class="btn danger"
+            id="importBtn">
+            ⬆️ Restore
+        </button>
+
+    </div>
+
+</section>
 
 </main>
 
-<nav class="tabbar">
-  <button class="active" data-view="dashboard" onclick="showView('dashboard')"><span class="ico">D</span>Dashboard</button>
-  <button data-view="purchases" onclick="showView('purchases')"><span class="ico">P</span>Purchases</button>
-  <button data-view="sales" onclick="showView('sales')"><span class="ico">S</span>Sales</button>
-  <button data-view="credit" onclick="showView('credit')"><span class="ico">C</span>Credit</button>
-  <button data-view="items" onclick="showView('items')"><span class="ico">I</span>Items</button>
+
+<!-- ================= NAVIGATION ================= -->
+
+<nav class="bottom-nav">
+
+    <div class="nav-inner">
+
+        <button
+            class="nav-btn active"
+            data-view="dashboardView">
+
+            <span class="nav-icon">📊</span>
+            ዳሽቦርድ
+
+        </button>
+
+
+        <button
+            class="nav-btn owner-nav"
+            data-view="purchasesView">
+
+            <span class="nav-icon">🛒</span>
+            ግዢ
+
+        </button>
+
+
+        <button
+            class="nav-btn"
+            data-view="salesView">
+
+            <span class="nav-icon">💰</span>
+            ሽያጭ
+
+        </button>
+
+
+        <button
+            class="nav-btn"
+            data-view="creditView">
+
+            <span class="nav-icon">📝</span>
+            ዱቤ
+
+        </button>
+
+
+        <button
+            class="nav-btn owner-nav"
+            data-view="itemsView">
+
+            <span class="nav-icon">📦</span>
+            እቃ
+
+        </button>
+
+
+        <button
+            class="nav-btn owner-nav"
+            data-view="backupView">
+
+            <span class="nav-icon">💾</span>
+            Backup
+
+        </button>
+
+    </div>
+
 </nav>
 
-<div class="modal-backdrop" id="payModalBackdrop">
-  <div class="modal">
-    <h3>Record payment</h3>
-    <div class="field"><label>Amount received</label><input type="number" id="payAmount" step="any" placeholder="0"></div>
-    <div class="field"><label>Date</label><input type="date" id="payDate"></div>
-    <button class="primary" onclick="submitPayment()">Save payment</button>
-    <button class="ghost" onclick="closePayModal()">Cancel</button>
-  </div>
 </div>
 
+
+<!-- ================= PAYMENT MODAL ================= -->
+
+<div
+    id="paymentModal"
+    class="modal hidden">
+
+    <div class="modal-box">
+
+        <h3>የዱቤ ክፍያ</h3>
+
+        <div id="paymentInfo"></div>
+
+        <div class="field">
+
+            <label>የሚከፈል መጠን</label>
+
+            <input
+                id="paymentAmount"
+                type="number"
+                min="0"
+                step="0.01">
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+                id="cancelPayment"
+                class="btn secondary">
+                ተወው
+            </button>
+
+            <button
+                id="confirmPayment"
+                class="btn">
+                ክፍያ መዝግብ
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
 <script>
-const STORE_KEY = 'stockLedgerData_v1';
 
-function loadData(){
-  const raw = localStorage.getItem(STORE_KEY);
-  if(raw){
-    try{ return JSON.parse(raw); }catch(e){}
-  }
-  return { items: [], purchases: [], sales: [] };
-}
-let data = loadData();
+/* =========================================================
+   1. FIREBASE CONFIGURATION
+   =========================================================
 
-function save(){
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
-}
+   Replace the values below with your Firebase Web App
+   configuration.
+========================================================= */
 
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+const firebaseConfig = {
 
-function fmt(n){
-  n = Number(n)||0;
-  return n.toLocaleString(undefined, {maximumFractionDigits:2});
-}
-function todayStr(){
-  const d = new Date();
-  return d.toISOString().slice(0,10);
-}
+    apiKey: "YOUR_API_KEY",
 
-// ---------- VIEW SWITCHING ----------
-function showView(name){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+name).classList.add('active');
-  document.querySelectorAll('nav.tabbar button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
-  if(name==='dashboard') renderDashboard();
-  if(name==='purchases') renderPurchases();
-  if(name==='sales') renderSales();
-  if(name==='credit') renderCredit();
-  if(name==='items') renderItems();
-}
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
 
-// ---------- ITEMS ----------
-function addItem(){
-  const name = document.getElementById('newItemName').value.trim();
-  const unit = document.getElementById('newItemUnit').value;
-  const qty = parseFloat(document.getElementById('newItemQty').value)||0;
-  const cost = parseFloat(document.getElementById('newItemCost').value)||0;
-  if(!name){ alert('Enter an item name'); return; }
-  data.items.push({ id: uid(), name, unit, qty, avgCost: qty>0?cost:0, stockValue: qty*cost });
-  save();
-  document.getElementById('newItemName').value='';
-  document.getElementById('newItemQty').value='';
-  document.getElementById('newItemCost').value='';
-  renderItems();
-  populateItemSelects();
-}
+    projectId: "YOUR_PROJECT_ID",
 
-function deleteItem(id){
-  if(!confirm('Delete this item? Its purchase/sale history stays but will show as removed.')) return;
-  data.items = data.items.filter(i=>i.id!==id);
-  save();
-  renderItems();
-  populateItemSelects();
-}
+    storageBucket: "YOUR_PROJECT.appspot.com",
 
-function renderItems(){
-  const el = document.getElementById('itemsList');
-  if(data.items.length===0){ el.innerHTML = '<div class="empty-note">No items yet. Add your first item above.</div>'; return; }
-  el.innerHTML = data.items.map(it=>`
-    <div class="item-row">
-      <div>
-        <div class="name">${escapeHtml(it.name)}</div>
-        <div class="meta">${fmt(it.qty)} ${it.unit} in stock · avg cost ${fmt(it.avgCost)}</div>
-      </div>
-      <div class="row-actions">
-        <button class="small" onclick="deleteItem('${it.id}')">Remove</button>
-      </div>
-    </div>
-  `).join('');
-}
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
 
-function populateItemSelects(){
-  const opts = data.items.map(i=>`<option value="${i.id}">${escapeHtml(i.name)} (${i.unit})</option>`).join('');
-  ['purchaseItem','saleItem'].forEach(id=>{
-    const el = document.getElementById(id);
-    const prev = el.value;
-    el.innerHTML = opts || '<option value="">No items — add one first</option>';
-    if(prev) el.value = prev;
-  });
-}
+    appId: "YOUR_APP_ID"
 
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+};
 
-// ---------- PURCHASES ----------
-function refreshPurchasePreview(){
-  const qty = parseFloat(document.getElementById('purchaseQty').value)||0;
-  const cost = parseFloat(document.getElementById('purchaseCost').value)||0;
-  document.getElementById('purchaseTotalPreview').textContent = fmt(qty*cost);
-}
-document.addEventListener('input', (e)=>{
-  if(e.target.id==='purchaseQty' || e.target.id==='purchaseCost') refreshPurchasePreview();
-});
 
-function addPurchase(){
-  const itemId = document.getElementById('purchaseItem').value;
-  const qty = parseFloat(document.getElementById('purchaseQty').value);
-  const unitCost = parseFloat(document.getElementById('purchaseCost').value);
-  const dateVal = document.getElementById('purchaseDate').value || todayStr();
-  if(!itemId){ alert('Add an item first'); return; }
-  if(!qty || qty<=0 || isNaN(unitCost)){ alert('Enter a valid quantity and cost'); return; }
-  const item = data.items.find(i=>i.id===itemId);
-  const total = qty*unitCost;
+/* =========================================================
+   2. OWNER UID
+   =========================================================
 
-  const newQty = item.qty + qty;
-  const newValue = (item.qty*item.avgCost) + total;
-  item.qty = newQty;
-  item.avgCost = newQty>0 ? newValue/newQty : 0;
+   After creating your owner account in Firebase:
 
-  data.purchases.push({ id: uid(), date: dateVal, itemId, itemName: item.name, unit: item.unit, qty, unitCost, total });
-  save();
-  document.getElementById('purchaseQty').value='';
-  document.getElementById('purchaseCost').value='';
-  refreshPurchasePreview();
-  renderPurchases();
-  renderItems();
+   Firebase Console
+   → Authentication
+   → Users
+   → Copy the owner's UID
+
+   Paste it here.
+========================================================= */
+
+const OWNER_UID = "YOUR_OWNER_UID";
+
+
+/* =========================================================
+   FIREBASE INITIALIZATION
+========================================================= */
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+
+const db = firebase.firestore();
+
+const dataRef = db
+    .collection("ekubManager")
+    .doc("main");
+
+
+/* =========================================================
+   APPLICATION DATA
+========================================================= */
+
+const DEFAULT_DATA = {
+
+    items: [],
+
+    purchases: [],
+
+    sales: [],
+
+    credits: []
+
+};
+
+let data = JSON.parse(
+    JSON.stringify(DEFAULT_DATA)
+);
+
+let currentUser = null;
+
+let isOwner = false;
+
+let unsubscribeData = null;
+
+let currentCreditId = null;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function money(value) {
+
+    return Number(value || 0)
+        .toLocaleString("en-US", {
+            maximumFractionDigits: 2
+        });
+
 }
 
-function renderPurchases(){
-  const el = document.getElementById('purchaseList');
-  const list = [...data.purchases].sort((a,b)=>b.date.localeCompare(a.date));
-  if(list.length===0){ el.innerHTML = '<div class="empty-note">No purchases recorded yet.</div>'; return; }
-  el.innerHTML = `<table class="ledger-table">
-    <tr><th>Date</th><th>Item</th><th class="num">Qty</th><th class="num">Cost/u</th><th class="num">Total</th></tr>
-    ${list.map(p=>`<tr>
-      <td class="muted">${p.date}</td>
-      <td>${escapeHtml(p.itemName)}</td>
-      <td class="num">${fmt(p.qty)}</td>
-      <td class="num">${fmt(p.unitCost)}</td>
-      <td class="num">${fmt(p.total)}</td>
-    </tr>`).join('')}
-  </table>`;
+
+function today() {
+
+    const d = new Date();
+
+    const y = d.getFullYear();
+
+    const m = String(
+        d.getMonth() + 1
+    ).padStart(2, "0");
+
+    const day = String(
+        d.getDate()
+    ).padStart(2, "0");
+
+    return `${y}-${m}-${day}`;
+
 }
 
-// ---------- SALES ----------
-function togglePaidField(){
-  const isCredit = document.getElementById('salePayment').value==='credit';
-  document.getElementById('creditFields').style.display = isCredit? 'block':'none';
-  document.getElementById('previewBalanceLine').style.display = isCredit? 'flex':'none';
-  refreshSalePreview();
+
+function makeId(prefix = "id") {
+
+    return prefix +
+        "_" +
+        Date.now() +
+        "_" +
+        Math.random()
+            .toString(36)
+            .slice(2, 9);
+
 }
 
-function refreshSalePreview(){
-  const itemId = document.getElementById('saleItem').value;
-  const item = data.items.find(i=>i.id===itemId);
-  const qty = parseFloat(document.getElementById('saleQty').value)||0;
-  const price = parseFloat(document.getElementById('salePrice').value)||0;
-  const avgCost = item? item.avgCost : 0;
-  const revenue = qty*price;
-  const cogs = qty*avgCost;
-  const profit = revenue-cogs;
-  const margin = revenue>0 ? (profit/revenue*100) : 0;
-  document.getElementById('previewRevenue').textContent = fmt(revenue);
-  document.getElementById('previewCogs').textContent = fmt(cogs);
-  document.getElementById('previewProfit').textContent = fmt(profit);
-  document.getElementById('previewMargin').textContent = fmt(margin)+'%';
 
-  if(document.getElementById('salePayment').value==='credit'){
-    const paid = parseFloat(document.getElementById('saleAmountPaid').value)||0;
-    document.getElementById('previewBalance').textContent = fmt(Math.max(revenue-paid,0));
-  }
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
 }
 
-function addSale(){
-  const itemId = document.getElementById('saleItem').value;
-  const qty = parseFloat(document.getElementById('saleQty').value);
-  const price = parseFloat(document.getElementById('salePrice').value);
-  const dateVal = document.getElementById('saleDate').value || todayStr();
-  const paymentType = document.getElementById('salePayment').value;
-  if(!itemId){ alert('Add an item first'); return; }
-  if(!qty || qty<=0 || isNaN(price)){ alert('Enter a valid quantity and price'); return; }
-  const item = data.items.find(i=>i.id===itemId);
-  if(qty > item.qty){
-    if(!confirm(`Only ${fmt(item.qty)} ${item.unit} in stock. Record sale anyway?`)) return;
-  }
 
-  const revenue = qty*price;
-  const cogs = qty*item.avgCost;
-  const profit = revenue-cogs;
-  const margin = revenue>0 ? (profit/revenue*100) : 0;
+function getItem(id) {
 
-  let customerName='', amountPaid=revenue, balance=0;
-  if(paymentType==='credit'){
-    customerName = document.getElementById('saleCustomer').value.trim();
-    amountPaid = parseFloat(document.getElementById('saleAmountPaid').value)||0;
-    balance = Math.max(revenue-amountPaid,0);
-    if(!customerName){ alert('Enter a customer name for credit sales'); return; }
-  }
+    return data.items.find(
+        item => item.id === id
+    );
 
-  item.qty -= qty;
-  item.stockValue = item.qty*item.avgCost;
-
-  data.sales.push({
-    id: uid(), date: dateVal, itemId, itemName: item.name, unit: item.unit,
-    qty, price, revenue, cogs, profit, margin,
-    paymentType, customerName, amountPaid, balance, payments: []
-  });
-  save();
-
-  document.getElementById('saleQty').value='';
-  document.getElementById('salePrice').value='';
-  document.getElementById('saleCustomer').value='';
-  document.getElementById('saleAmountPaid').value='';
-  document.getElementById('salePayment').value='full';
-  togglePaidField();
-  refreshSalePreview();
-  renderSales();
-  renderItems();
 }
 
-function renderSales(){
-  const el = document.getElementById('saleList');
-  const list = [...data.sales].sort((a,b)=>b.date.localeCompare(a.date));
-  if(list.length===0){ el.innerHTML = '<div class="empty-note">No sales recorded yet.</div>'; return; }
-  el.innerHTML = `<table class="ledger-table">
-    <tr><th>Date</th><th>Item</th><th class="num">Qty</th><th class="num">Revenue</th><th class="num">Profit</th><th>Status</th></tr>
-    ${list.map(s=>`<tr>
-      <td class="muted">${s.date}</td>
-      <td>${escapeHtml(s.itemName)}</td>
-      <td class="num">${fmt(s.qty)}</td>
-      <td class="num">${fmt(s.revenue)}</td>
-      <td class="num">${fmt(s.profit)}</td>
-      <td>${s.paymentType==='credit' ? `<span class="pill credit">${s.balance>0?'owes '+fmt(s.balance):'settled'}</span>` : `<span class="pill paid">paid</span>`}</td>
-    </tr>`).join('')}
-  </table>`;
+
+function stockForItem(itemId) {
+
+    let purchased = data.purchases
+
+        .filter(p => p.itemId === itemId)
+
+        .reduce(
+            (sum, p) =>
+                sum + Number(p.qty || 0),
+            0
+        );
+
+
+    let sold = data.sales
+
+        .filter(s => s.itemId === itemId)
+
+        .reduce(
+            (sum, s) =>
+                sum + Number(s.qty || 0),
+            0
+        );
+
+
+    return purchased - sold;
+
 }
 
-// ---------- CREDIT ----------
-let payingSaleId = null;
-function openPayModal(saleId){
-  payingSaleId = saleId;
-  document.getElementById('payAmount').value='';
-  document.getElementById('payDate').value = todayStr();
-  document.getElementById('payModalBackdrop').classList.add('active');
-}
-function closePayModal(){
-  document.getElementById('payModalBackdrop').classList.remove('active');
-  payingSaleId=null;
-}
-function submitPayment(){
-  const amt = parseFloat(document.getElementById('payAmount').value);
-  const date = document.getElementById('payDate').value || todayStr();
-  if(!amt || amt<=0){ alert('Enter a valid amount'); return; }
-  const sale = data.sales.find(s=>s.id===payingSaleId);
-  if(!sale) return;
-  sale.payments.push({date, amount:amt});
-  sale.amountPaid += amt;
-  sale.balance = Math.max(sale.revenue - sale.amountPaid, 0);
-  save();
-  closePayModal();
-  renderCredit();
-  renderSales();
-  renderDashboard();
-}
 
-function renderCredit(){
-  const el = document.getElementById('creditList');
-  const outstanding = data.sales.filter(s=>s.paymentType==='credit' && s.balance>0)
-                                  .sort((a,b)=>b.date.localeCompare(a.date));
-  const total = outstanding.reduce((sum,s)=>sum+s.balance,0);
-  document.getElementById('creditTotalTag').textContent = outstanding.length ? `total owed ${fmt(total)}` : '';
-  if(outstanding.length===0){ el.innerHTML = '<div class="empty-note">No outstanding credit. All sales settled.</div>'; return; }
-  el.innerHTML = outstanding.map(s=>`
-    <div class="item-row">
-      <div>
-        <div class="name">${escapeHtml(s.customerName||'Unnamed')}</div>
-        <div class="meta">${escapeHtml(s.itemName)} · ${s.date} · owes ${fmt(s.balance)} of ${fmt(s.revenue)}</div>
-      </div>
-      <div class="row-actions">
-        <button class="small" onclick="openPayModal('${s.id}')">Record payment</button>
-      </div>
-    </div>
-  `).join('');
-}
+function averageCost(itemId) {
 
-// ---------- DASHBOARD ----------
-function renderDashboard(){
-  const now = new Date();
-  const ym = now.toISOString().slice(0,7);
-  document.getElementById('monthLabel').textContent = now.toLocaleString(undefined,{month:'long', year:'numeric'});
+    const purchases =
+        data.purchases.filter(
+            p => p.itemId === itemId
+        );
 
-  const monthSales = data.sales.filter(s=>s.date.slice(0,7)===ym);
-  const monthPurchases = data.purchases.filter(p=>p.date.slice(0,7)===ym);
-  const mSalesTotal = monthSales.reduce((s,x)=>s+x.revenue,0);
-  const mProfitTotal = monthSales.reduce((s,x)=>s+x.profit,0);
-  const mPurchaseTotal = monthPurchases.reduce((s,x)=>s+x.total,0);
-  const mMargin = mSalesTotal>0 ? (mProfitTotal/mSalesTotal*100) : 0;
 
-  document.getElementById('mSales').textContent = fmt(mSalesTotal);
-  document.getElementById('mProfit').textContent = fmt(mProfitTotal);
-  document.getElementById('mPurchases').textContent = fmt(mPurchaseTotal);
-  document.getElementById('mMargin').textContent = fmt(mMargin)+'%';
+    if (!purchases.length) {
 
-  const tSalesTotal = data.sales.reduce((s,x)=>s+x.revenue,0);
-  const tProfitTotal = data.sales.reduce((s,x)=>s+x.profit,0);
-  const tPurchaseTotal = data.purchases.reduce((s,x)=>s+x.total,0);
-  const tCreditTotal = data.sales.filter(s=>s.paymentType==='credit').reduce((s,x)=>s+x.balance,0);
+        return 0;
 
-  document.getElementById('tSales').textContent = fmt(tSalesTotal);
-  document.getElementById('tProfit').textContent = fmt(tProfitTotal);
-  document.getElementById('tPurchases').textContent = fmt(tPurchaseTotal);
-  document.getElementById('tCredit').textContent = fmt(tCreditTotal);
-
-  const stockValue = data.items.reduce((s,i)=>s+(i.qty*i.avgCost),0);
-  document.getElementById('stockValueTag').textContent = 'value '+fmt(stockValue);
-
-  const stockList = document.getElementById('stockList');
-  if(data.items.length===0){
-    stockList.innerHTML = '<div class="empty-note">No items yet — add materials under the Items tab.</div>';
-  } else {
-    stockList.innerHTML = data.items.map(it=>`
-      <div class="item-row">
-        <div>
-          <div class="name">${escapeHtml(it.name)}</div>
-          <div class="meta">avg cost ${fmt(it.avgCost)} / ${it.unit}</div>
-        </div>
-        <div class="stockval">
-          ${fmt(it.qty)} ${it.unit}
-          <div class="v">${fmt(it.qty*it.avgCost)}</div>
-        </div>
-      </div>
-    `).join('');
-  }
-}
-
-// ---------- BACKUP ----------
-function exportData(){
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'stock-ledger-backup-'+todayStr()+'.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-function importData(evt){
-  const file = evt.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
-    try{
-      const parsed = JSON.parse(e.target.result);
-      if(!parsed.items || !parsed.purchases || !parsed.sales) throw new Error('bad format');
-      if(!confirm('This will replace all current data with the backup file. Continue?')) return;
-      data = parsed;
-      save();
-      populateItemSelects();
-      showView('dashboard');
-    }catch(err){
-      alert('Could not read that file as a valid backup.');
     }
-  };
-  reader.readAsText(file);
-  evt.target.value='';
+
+
+    let qty = 0;
+
+    let total = 0;
+
+
+    purchases.forEach(p => {
+
+        const q = Number(p.qty || 0);
+
+        const c = Number(p.cost || 0);
+
+        qty += q;
+
+        total += q * c;
+
+    });
+
+
+    return qty ? total / qty : 0;
+
 }
 
-// ---------- INIT ----------
-document.getElementById('purchaseDate').value = todayStr();
-document.getElementById('saleDate').value = todayStr();
-populateItemSelects();
-renderDashboard();
-</script>
-</body>
-</html>
+
+/* =========================================================
+   UI
+========================================================= */
+
+function showView(viewId) {
+
+    document
+        .querySelectorAll(".view")
+        .forEach(view => {
+
+            view.classList.remove("active");
+
+        });
+
+
+    const target =
+        document.getElementById(viewId);
+
+    if (target) {
+
+        target.classList.add("active");
+
+    }
+
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.view === viewId
+            );
+
+        });
+
+}
+
+
+document
+    .querySelectorAll(".nav-btn")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    button.classList.contains(
+                        "owner-nav"
+                    ) &&
+                    !isOwner
+                ) {
+
+                    alert(
+                        "ይህን ክፍል ለመጠቀም Owner መሆን አለብዎት።"
+                    );
+
+                    return;
+
+                }
+
+
+                showView(
+                    button.dataset.view
+                );
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   ROLE / PERMISSIONS
+========================================================= */
+
+function applyPermissions() {
+
+    const roleLabel =
+        document.getElementById(
+            "roleLabel"
+        );
+
+    const roleText =
+        document.getElementById(
+            "userRoleText"
+        );
+
+
+    if (isOwner) {
+
+        roleLabel.textContent =
+            "OWNER / EDITOR";
+
+        roleLabel.className =
+            "role-owner";
+
+        roleText.textContent =
+            currentUser.email +
+            " • Owner / Editor";
+
+
+        document
+            .querySelectorAll(".owner-only")
+            .forEach(el => {
+
+                el.classList.remove(
+                    "hidden"
+                );
+
+            });
+
+
+        document
+            .querySelectorAll(".owner-view")
+            .forEach(el => {
+
+                el.classList.remove(
+                    "hidden"
+                );
+
+            });
+
+
+        document
+            .querySelectorAll(".owner-editable")
+            .forEach(el => {
+
+                el.classList.remove(
+                    "hidden"
+                );
+
+            });
+
+
+        document
+            .getElementById(
+                "readOnlyMessage"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+    } else {
+
+        roleLabel.textContent =
+            "EMPLOYEE / VIEW ONLY";
+
+        roleLabel.className =
+            "role-employee";
+
+        roleText.textContent =
+            currentUser.email +
+            " • View Only";
+
+
+        document
+            .querySelectorAll(".owner-only")
+            .forEach(el => {
+
+                el.classList.add(
+                    "hidden"
+                );
+
+            });
+
+
+        document
+            .querySelectorAll(".owner-view")
+            .forEach(el => {
+
+                el.classList.add(
+                    "hidden"
+                );
+
+            });
+
+
+        document
+            .querySelectorAll(".owner-editable")
+            .forEach(el => {
+
+                el.classList.add(
+                    "hidden"
+                );
+
+            });
+
+
+        document
+            .getElementById(
+                "readOnlyMessage"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOUD SAVE
+========================================================= */
+
+async function saveCloud() {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    if (!isOwner) {
+
+        alert(
+            "የአርትዖት ፈቃድ የለዎትም።"
+        );
+
+        return;
+
+    }
+
+
+    setSync(
+        "☁️ እየተቀመጠ..."
+    );
+
+
+    try {
+
+        await dataRef.set({
+
+            data: data,
+
+            updatedAt:
+                firebase.firestore.FieldValue
+                    .serverTimestamp(),
+
+            updatedBy:
+                currentUser.uid
+
+        });
+
+
+        setSync(
+            "☁️ ተመሳስሏል"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        setSync(
+            "⚠️ ማስቀመጥ አልተቻለም",
+            true
+        );
+
+        alert(
+            "ዳታውን ማስቀመጥ አልተቻለም።\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   REAL-TIME CLOUD SYNC
+========================================================= */
+
+function startCloudSync() {
+
+    if (unsubscribeData) {
+
+        unsubscribeData();
+
+    }
+
+
+    setSync(
+        "☁️ እየተገናኘ..."
+    );
+
+
+    unsubscribeData =
+        dataRef.onSnapshot(
+
+            async snapshot => {
+
+                if (snapshot.exists) {
+
+                    const cloud =
+                        snapshot.data();
+
+                    if (cloud.data) {
+
+                        data = normalizeData(
+                            cloud.data
+                        );
+
+                    }
+
+                } else {
+
+                    data =
+                        JSON.parse(
+                            JSON.stringify(
+                                DEFAULT_DATA
+                            )
+                        );
+
+
+                    /*
+                     * If this is the owner and
+                     * the old app has localStorage
+                     * data, migrate it automatically.
+                     */
+
+                    if (isOwner) {
+
+                        const oldData =
+                            localStorage.getItem(
+                                "stockLedgerData_v1"
+                            );
+
+
+                        if (oldData) {
+
+                            try {
+
+                                const parsed =
+                                    JSON.parse(
+                                        oldData
+                                    );
+
+
+                                data =
+                                    normalizeData(
+                                        parsed
+                                    );
+
+
+                                await dataRef.set({
+
+                                    data: data,
+
+                                    updatedAt:
+                                        firebase.firestore
+                                            .FieldValue
+                                            .serverTimestamp(),
+
+                                    updatedBy:
+                                        currentUser.uid,
+
+                                    migratedFromLocalStorage:
+                                        true
+
+                                });
+
+                            } catch (e) {
+
+                                console.error(
+                                    "Migration error:",
+                                    e
+                                );
+
+                            }
+
+                        } else {
+
+                            await saveCloud();
+
+                        }
+
+                    }
+
+                }
+
+
+                renderAll();
+
+                setSync(
+                    "☁️ ተመሳስሏል"
+                );
+
+            },
+
+            error => {
+
+                console.error(
+                    "Firestore sync error:",
+                    error
+                );
+
+
+                setSync(
+                    "⚠️ Sync ስህተት",
+                    true
+                );
+
+            }
+
+        );
+
+}
+
+
+/* =========================================================
+   NORMALIZE DATA
+========================================================= */
+
+function normalizeData(input) {
+
+    return {
+
+        items:
+            Array.isArray(input.items)
+                ? input.items
+                : [],
+
+        purchases:
+            Array.isArray(input.purchases)
+                ? input.purchases
+                : [],
+
+        sales:
+            Array.isArray(input.sales)
+                ? input.sales
+                : [],
+
+        credits:
+            Array.isArray(input.credits)
+                ? input.credits
+                : []
+
+    };
+
+}
+
+
+/* =========================================================
+   SYNC STATUS
+========================================================= */
+
+function setSync(text, offline = false) {
+
+    const el =
+        document.getElementById(
+            "syncStatus"
+        );
+
+    el
