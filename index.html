@@ -9,8 +9,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ክምችት">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%230f1424'/%3E%3Crect x='6' y='6' width='52' height='52' rx='9' fill='%23181f3a' stroke='%232b3462' stroke-width='2'/%3E%3Crect x='13' y='39' width='16' height='9' rx='1.5' fill='%23cda05f'/%3E%3Crect x='33' y='39' width='16' height='9' rx='1.5' fill='%23cda05f'/%3E%3Crect x='21' y='27' width='16' height='9' rx='1.5' fill='%23cda05f' opacity='0.85'/%3E%3Crect x='41' y='27' width='9' height='9' rx='1.5' fill='%23cda05f' opacity='0.85'/%3E%3Crect x='12' y='27' width='6' height='9' rx='1.5' fill='%23cda05f' opacity='0.85'/%3E%3Crect x='27' y='15' width='16' height='9' rx='1.5' fill='%23cda05f' opacity='0.65'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230f1424'/%3E%3Crect x='6' y='6' width='52' height='52' rx='9' fill='%23181f3a' stroke='%232b3462' stroke-width='2'/%3E%3Crect x='13' y='39' width='16' height='9' rx='1.5' fill='%23cda05f'/%3E%3Crect x='33' y='39' width='16' height='9' rx='1.5' fill='%23cda05f'/%3E%3Crect x='21' y='27' width='16' height='9' rx='1.5' fill='%23cda05f' opacity='0.85'/%3E%3Crect x='41' y='27' width='9' height='9' rx='1.5' fill='%23cda05f' opacity='0.85'/%3E%3Crect x='12' y='27' width='6' height='9' rx='1.5' fill='%23cda05f' opacity='0.85'/%3E%3Crect x='27' y='15' width='16' height='9' rx='1.5' fill='%23cda05f' opacity='0.65'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -70,8 +72,7 @@
     padding:14px 14px 12px;
   }
   .stat-card .label{font-size:11.5px; color:var(--muted); margin-bottom:6px;}
-      Asse🙄, [Sep 12, 2026 at 9:47 PM]
-.stat-card .value{font-family:'Fraunces',serif; font-size:21px; font-weight:600;}
+  .stat-card .value{font-family:'Fraunces',serif; font-size:21px; font-weight:600;}
   .stat-card .value.green{color:var(--green);}
   .stat-card .value.gold{color:var(--gold);}
   .stat-card .value.red{color:var(--red);}
@@ -160,9 +161,8 @@
   .item-row .meta{font-size:12px; color:var(--muted); margin-top:2px;}
   .item-row .stockval{text-align:right; font-size:13.5px;}
   .item-row .stockval .v{color:var(--muted); font-size:11.5px;}
-      
-Asse🙄, [Sep 12, 2026 at 9:47 PM]
-.modal-backdrop{
+
+  .modal-backdrop{
     display:none; position:fixed; inset:0; background:rgba(6,8,18,.7); z-index:20;
     align-items:flex-end; justify-content:center;
   }
@@ -174,9 +174,62 @@ Asse🙄, [Sep 12, 2026 at 9:47 PM]
   .modal h3{font-family:'Fraunces',serif; font-weight:600; font-size:17px; margin:0 0 14px;}
   .link-btn{background:none;border:none;color:var(--gold);font-size:12.5px;cursor:pointer;padding:0;}
   .top-actions{display:flex; justify-content:flex-end; margin-bottom:8px;}
+
+  /* Login screen */
+  .login-screen{
+    position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+    padding:24px; background:radial-gradient(circle at 50% 0%, #1a2246, #0f1424 65%);
+  }
+  .login-card{
+    width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:32px 26px 28px; text-align:center;
+  }
+  .login-card h1{
+    font-family:'Fraunces',serif; font-weight:600; font-size:23px; margin:14px 0 4px;
+  }
+  .login-card .sub{color:var(--muted); font-size:13px; margin-bottom:22px;}
+  .login-card .field{text-align:left;}
+  .login-card button.primary{margin-top:10px;}
+  .login-hint{color:var(--muted-dim); font-size:12px; margin-top:14px; line-height:1.5;}
+  .login-error{
+    color:var(--red); font-size:12.5px; background:#2a1c1c; border:1px solid #4a2e2b;
+    border-radius:var(--radius); padding:8px 10px; margin-bottom:12px; display:none; text-align:left;
+  }
 </style>
 </head>
 <body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <svg width="52" height="52" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="60" height="60" rx="13" fill="var(--surface-alt)" stroke="var(--border)" stroke-width="2"/>
+      <rect x="13" y="39" width="16" height="9" rx="1.5" fill="var(--gold)"/>
+      <rect x="33" y="39" width="16" height="9" rx="1.5" fill="var(--gold)"/>
+      <rect x="21" y="27" width="16" height="9" rx="1.5" fill="var(--gold)" opacity="0.85"/>
+      <rect x="41" y="27" width="9" height="9" rx="1.5" fill="var(--gold)" opacity="0.85"/>
+      <rect x="12" y="27" width="6" height="9" rx="1.5" fill="var(--gold)" opacity="0.85"/>
+      <rect x="27" y="15" width="16" height="9" rx="1.5" fill="var(--gold)" opacity="0.65"/>
+    </svg>
+    <h1>የክምችት መዝገብ</h1>
+    <div class="sub" id="loginSubtitle">የንግድ እና የክምችት አስተዳደር</div>
+
+    <div class="login-error" id="loginError"></div>
+
+    <div class="field">
+      <label>ኢሜይል</label>
+      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>የይለፍ ቃል</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLoginSubmit()">
+    </div>
+
+    <button class="primary" id="loginSubmitBtn" onclick="handleLoginSubmit()">ግባ</button>
+    <div class="login-hint" id="loginHint"></div>
+  </div>
+</div>
+
+<div id="appShell" style="display:none;">
 
 <div class="app-header">
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -195,7 +248,10 @@ Asse🙄, [Sep 12, 2026 at 9:47 PM]
         <div class="sub">ግዢ · ሽያጭ · ብድር · ትርፍ</div>
       </div>
     </div>
-    <button id="roleToggleBtn" onclick="handleRoleToggle()" style="background:var(--surface-alt); border:1px solid var(--border); color:var(--gold); padding:7px 12px; border-radius:20px; font-size:12px; font-family:'Inter',sans-serif; white-space:nowrap;">🔒 ሰራተኛ</button>
+    <div style="display:flex; align-items:center; gap:6px;">
+      <button id="roleToggleBtn" onclick="handleRoleToggle()" style="background:var(--surface-alt); border:1px solid var(--border); color:var(--gold); padding:7px 12px; border-radius:20px; font-size:12px; font-family:'Inter',sans-serif; white-space:nowrap;">🔒 ሰራተኛ</button>
+      <button id="logoutBtn" onclick="handleLogout()" title="ውጣ" style="background:var(--surface-alt); border:1px solid var(--border); color:var(--muted); padding:7px 10px; border-radius:20px; font-size:12px; font-family:'Inter',sans-serif;">⏻</button>
+    </div>
   </div>
 </div>
 
@@ -238,9 +294,7 @@ Asse🙄, [Sep 12, 2026 at 9:47 PM]
       </div>
       <div class="field-row">
         <div class="field"><label>ብዛት</label><input type="number" id="purchaseQty" step="any" placeholder="0"></div>
-            
-Asse🙄, [Sep 12, 2026 at 9:47 PM]
-<div class="field"><label>የአሃድ ዋጋ</label><input type="number" id="purchaseCost" step="any" placeholder="0"></div>
+        <div class="field"><label>የአሃድ ዋጋ</label><input type="number" id="purchaseCost" step="any" placeholder="0"></div>
       </div>
       <div class="field"><label>ቀን</label><input type="date" id="purchaseDate"></div>
       <div class="computed-line"><span>ጠቅላላ ዋጋ</span><strong id="purchaseTotalPreview">0</strong></div>
@@ -321,8 +375,7 @@ Asse🙄, [Sep 12, 2026 at 9:47 PM]
             <option value="liters">ሊትር</option>
             <option value="boxes">ካርቶን</option>
             <option value="rolls">ጥቅል</option>
-                Asse🙄, [Sep 12, 2026 at 9:47 PM]
-</select>
+          </select>
         </div>
         <div class="field"><label>መነሻ ክምችት</label><input type="number" id="newItemQty" step="any" placeholder="0"></div>
       </div>
@@ -357,6 +410,8 @@ Asse🙄, [Sep 12, 2026 at 9:47 PM]
     <button class="ghost" onclick="closePayModal()">ሰርዝ</button>
   </div>
 </div>
+
+</div><!-- /#appShell -->
 
 <script>
 const STORE_KEY = 'stockLedgerData_v1';
@@ -418,9 +473,7 @@ function showView(name){
 function addItem(){
   const name = document.getElementById('newItemName').value.trim();
   const unit = document.getElementById('newItemUnit').value;
-
-      Asse🙄, [Sep 12, 2026 at 9:47 PM]
-const qty = parseFloat(document.getElementById('newItemQty').value)||0;
+  const qty = parseFloat(document.getElementById('newItemQty').value)||0;
   const cost = parseFloat(document.getElementById('newItemCost').value)||0;
   if(!name){ alert('የዕቃ ስም አስገባ'); return; }
   data.items.push({ id: uid(), name, unit, qty, avgCost: qty>0?cost:0, stockValue: qty*cost });
@@ -433,5 +486,538 @@ const qty = parseFloat(document.getElementById('newItemQty').value)||0;
 }
 
 function deleteItem(id){
-  if(!confirm('ይህን ዕቃ ማጥፋት ትፈልጋለህ? የግዢ/ሽያጭ ታሪኩ
+  if(!confirm('ይህን ዕቃ ማጥፋት ትፈልጋለህ? የግዢ/ሽያጭ ታሪኩ ይቆያል፣ ግን እንደተወገደ ይታያል።')) return;
+  data.items = data.items.filter(i=>i.id!==id);
+  save();
+  renderItems();
+  populateItemSelects();
+}
 
+function renderItems(){
+  const el = document.getElementById('itemsList');
+  if(data.items.length===0){ el.innerHTML = '<div class="empty-note">ገና ዕቃ የለም። የመጀመሪያ ዕቃህን ከላይ ጨምር።</div>'; return; }
+  el.innerHTML = data.items.map(it=>`
+    <div class="item-row">
+      <div>
+        <div class="name">${escapeHtml(it.name)}</div>
+        <div class="meta">${fmt(it.qty)} ${unitLabel(it.unit)} በክምችት${role==='owner' ? ' · አማካይ ዋጋ '+fmt(it.avgCost) : ''}</div>
+      </div>
+      <div class="row-actions">
+        <button class="small" onclick="deleteItem('${it.id}')">አስወግድ</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function populateItemSelects(){
+  const opts = data.items.map(i=>`<option value="${i.id}">${escapeHtml(i.name)} (${unitLabel(i.unit)})</option>`).join('');
+  ['purchaseItem','saleItem'].forEach(id=>{
+    const el = document.getElementById(id);
+    const prev = el.value;
+    el.innerHTML = opts || '<option value="">ገና ዕቃ የለም — መጀመሪያ ጨምር</option>';
+    if(prev) el.value = prev;
+  });
+}
+
+const UNIT_LABELS = { pieces:'ፍሬ', bags:'ከረጢት', kg:'ኪ.ግ', meters:'ሜትር', sqm:'ካሬ ሜትር', liters:'ሊትር', boxes:'ካርቶን', rolls:'ጥቅል' };
+function unitLabel(u){ return UNIT_LABELS[u] || u; }
+
+// ---------- ROLE / ACCESS ----------
+let role = 'employee';
+let ownerPin = localStorage.getItem('ownerPin') || null;
+
+function handleRoleToggle(){
+  if(role==='owner'){
+    role = 'employee';
+    updateRoleUI();
+    return;
+  }
+  if(!ownerPin){
+    const p1 = prompt('የባለቤት መዳረሻ የይለፍ ቁጥር ይፍጠሩ:');
+    if(!p1) return;
+    const p2 = prompt('የይለፍ ቁጥሩን ደግመው ያስገቡ:');
+    if(p1!==p2){ alert('የይለፍ ቁጥሮቹ አይመሳሰሉም። እንደገና ሞክር።'); return; }
+    ownerPin = p1;
+    localStorage.setItem('ownerPin', ownerPin);
+    role = 'owner';
+    updateRoleUI();
+    return;
+  }
+  const entered = prompt('የባለቤት የይለፍ ቁጥር ያስገቡ:');
+  if(entered===null) return;
+  if(entered===ownerPin){
+    role = 'owner';
+    updateRoleUI();
+  } else {
+    alert('የተሳሳተ የይለፍ ቁጥር።');
+  }
+}
+
+function updateRoleUI(){
+  const isOwner = role==='owner';
+  document.getElementById('roleToggleBtn').textContent = isOwner ? '🔓 ባለቤት' : '🔒 ሰራተኛ';
+  document.getElementById('ownerDashboardBlock').style.display = isOwner ? '' : 'none';
+  document.getElementById('newItemCostField').style.display = isOwner ? '' : 'none';
+  document.getElementById('salePreviewOwnerBlock').style.display = isOwner ? '' : 'none';
+  const purchNavBtn = document.querySelector('nav.tabbar button[data-view="purchases"]');
+  purchNavBtn.style.display = isOwner ? '' : 'none';
+  if(!isOwner && document.getElementById('view-purchases').classList.contains('active')){
+    showView('dashboard');
+  }
+  renderDashboard();
+  renderItems();
+  renderSales();
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------- PURCHASES ----------
+function refreshPurchasePreview(){
+  const qty = parseFloat(document.getElementById('purchaseQty').value)||0;
+  const cost = parseFloat(document.getElementById('purchaseCost').value)||0;
+  document.getElementById('purchaseTotalPreview').textContent = fmt(qty*cost);
+}
+document.addEventListener('input', (e)=>{
+  if(e.target.id==='purchaseQty' || e.target.id==='purchaseCost') refreshPurchasePreview();
+});
+
+function addPurchase(){
+  const itemId = document.getElementById('purchaseItem').value;
+  const qty = parseFloat(document.getElementById('purchaseQty').value);
+  const unitCost = parseFloat(document.getElementById('purchaseCost').value);
+  const dateVal = document.getElementById('purchaseDate').value || todayStr();
+  if(!itemId){ alert('መጀመሪያ ዕቃ ጨምር'); return; }
+  if(!qty || qty<=0 || isNaN(unitCost)){ alert('ትክክለኛ ብዛት እና ዋጋ አስገባ'); return; }
+  const item = data.items.find(i=>i.id===itemId);
+  const total = qty*unitCost;
+
+  const newQty = item.qty + qty;
+  const newValue = (item.qty*item.avgCost) + total;
+  item.qty = newQty;
+  item.avgCost = newQty>0 ? newValue/newQty : 0;
+
+  data.purchases.push({ id: uid(), date: dateVal, itemId, itemName: item.name, unit: item.unit, qty, unitCost, total });
+  save();
+  document.getElementById('purchaseQty').value='';
+  document.getElementById('purchaseCost').value='';
+  refreshPurchasePreview();
+  renderPurchases();
+  renderItems();
+}
+
+function renderPurchases(){
+  const el = document.getElementById('purchaseList');
+  const list = [...data.purchases].sort((a,b)=>b.date.localeCompare(a.date));
+  if(list.length===0){ el.innerHTML = '<div class="empty-note">እስካሁን ምንም ግዢ አልተመዘገበም።</div>'; return; }
+  el.innerHTML = `<table class="ledger-table">
+    <tr><th>ቀን</th><th>ዕቃ</th><th class="num">ብዛት</th><th class="num">ዋጋ/አሃድ</th><th class="num">ጠቅላላ</th></tr>
+    ${list.map(p=>`<tr>
+      <td class="muted">${p.date}</td>
+      <td>${escapeHtml(p.itemName)}</td>
+      <td class="num">${fmt(p.qty)}</td>
+      <td class="num">${fmt(p.unitCost)}</td>
+      <td class="num">${fmt(p.total)}</td>
+    </tr>`).join('')}
+  </table>`;
+}
+
+// ---------- SALES (multi-item cart) ----------
+let saleCart = [];
+
+function refreshCartLinePreview(){
+  const itemId = document.getElementById('saleItem').value;
+  const item = data.items.find(i=>i.id===itemId);
+  const qty = parseFloat(document.getElementById('saleQty').value)||0;
+  const note = document.getElementById('cartLineNote');
+  if(item && qty>0){
+    const alreadyInCart = saleCart.filter(l=>l.itemId===itemId).reduce((s,l)=>s+l.qty,0);
+    const remaining = item.qty - alreadyInCart;
+    note.style.display='flex';
+    note.innerHTML = `<span>በክምችት የቀረ</span><strong>${fmt(remaining)} ${unitLabel(item.unit)}</strong>`;
+  } else {
+    note.style.display='none';
+  }
+}
+
+function addCartLine(){
+  const itemId = document.getElementById('saleItem').value;
+  const qty = parseFloat(document.getElementById('saleQty').value);
+  const price = parseFloat(document.getElementById('salePrice').value);
+  if(!itemId){ alert('መጀመሪያ ዕቃ ጨምር'); return; }
+  if(!qty || qty<=0 || isNaN(price)){ alert('ትክክለኛ ብዛት እና ዋጋ አስገባ'); return; }
+  const item = data.items.find(i=>i.id===itemId);
+  const alreadyInCart = saleCart.filter(l=>l.itemId===itemId).reduce((s,l)=>s+l.qty,0);
+  if(qty > (item.qty - alreadyInCart)){
+    if(!confirm(`በክምችት ውስጥ የቀረው ${fmt(item.qty-alreadyInCart)} ${unitLabel(item.unit)} ብቻ ነው። ይህን ንጥል ትጨምራለህ?`)) return;
+  }
+  saleCart.push({ itemId, itemName: item.name, unit: item.unit, qty, price, avgCost: item.avgCost });
+  document.getElementById('saleQty').value='';
+  document.getElementById('salePrice').value='';
+  refreshCartLinePreview();
+  renderCart();
+}
+
+function removeCartLine(idx){
+  saleCart.splice(idx,1);
+  renderCart();
+}
+
+function renderCart(){
+  const el = document.getElementById('saleCartList');
+  const tag = document.getElementById('cartCountTag');
+  tag.textContent = saleCart.length ? `${saleCart.length} ንጥል` : '';
+  if(saleCart.length===0){
+    el.innerHTML = '<div class="empty-note" style="border:none;">ገና ወደ ደንበኛው ዝርዝር ዕቃ አልተጨመረም። ከላይ «ወደ ዝርዝር ጨምር» ተጫን።</div>';
+  } else {
+    el.innerHTML = saleCart.map((l,idx)=>`
+      <div class="item-row" style="padding:11px 14px;">
+        <div>
+          <div class="name">${escapeHtml(l.itemName)}</div>
+          <div class="meta">${fmt(l.qty)} ${unitLabel(l.unit)} × ${fmt(l.price)}</div>
+        </div>
+        <div class="row-actions">
+          <div class="stockval">${fmt(l.qty*l.price)}</div>
+          <button class="small" onclick="removeCartLine(${idx})">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  refreshCartTotals();
+}
+
+function refreshCartTotals(){
+  const revenue = saleCart.reduce((s,l)=>s+l.qty*l.price,0);
+  const cogs = saleCart.reduce((s,l)=>s+l.qty*l.avgCost,0);
+  const profit = revenue-cogs;
+  const margin = revenue>0 ? (profit/revenue*100) : 0;
+  document.getElementById('previewRevenue').textContent = fmt(revenue);
+  document.getElementById('previewCogs').textContent = fmt(cogs);
+  document.getElementById('previewProfit').textContent = fmt(profit);
+  document.getElementById('previewMargin').textContent = fmt(margin)+'%';
+
+  if(document.getElementById('salePayment').value==='credit'){
+    const paid = parseFloat(document.getElementById('saleAmountPaid').value)||0;
+    document.getElementById('previewBalance').textContent = fmt(Math.max(revenue-paid,0));
+  }
+}
+
+function togglePaidField(){
+  const isCredit = document.getElementById('salePayment').value==='credit';
+  document.getElementById('creditFields').style.display = isCredit? 'block':'none';
+  document.getElementById('previewBalanceLine').style.display = isCredit? 'flex':'none';
+  refreshCartTotals();
+}
+
+function finalizeSale(){
+  if(saleCart.length===0){ alert('መጀመሪያ ቢያንስ አንድ ዕቃ ወደ ደንበኛው ዝርዝር ጨምር'); return; }
+  const dateVal = document.getElementById('saleDate').value || todayStr();
+  const paymentType = document.getElementById('salePayment').value;
+
+  const revenue = saleCart.reduce((s,l)=>s+l.qty*l.price,0);
+  const cogs = saleCart.reduce((s,l)=>s+l.qty*l.avgCost,0);
+  const profit = revenue-cogs;
+  const margin = revenue>0 ? (profit/revenue*100) : 0;
+
+  let customerName='', amountPaid=revenue, balance=0;
+  if(paymentType==='credit'){
+    customerName = document.getElementById('saleCustomer').value.trim();
+    amountPaid = parseFloat(document.getElementById('saleAmountPaid').value)||0;
+    balance = Math.max(revenue-amountPaid,0);
+    if(!customerName){ alert('ለብድር ሽያጭ የደንበኛ ስም አስገባ'); return; }
+  }
+
+  const items = saleCart.map(l=>{
+    const item = data.items.find(i=>i.id===l.itemId);
+    const lineRevenue = l.qty*l.price;
+    const lineCogs = l.qty*l.avgCost;
+    if(item){ item.qty -= l.qty; item.stockValue = item.qty*item.avgCost; }
+    return {
+      itemId: l.itemId, itemName: l.itemName, unit: l.unit, qty: l.qty, price: l.price,
+      revenue: lineRevenue, cogs: lineCogs, profit: lineRevenue-lineCogs
+    };
+  });
+
+  data.sales.push({
+    id: uid(), date: dateVal, customerName, paymentType,
+    revenue, cogs, profit, margin, amountPaid, balance, payments: [], items
+  });
+  save();
+
+  saleCart = [];
+  document.getElementById('saleCustomer').value='';
+  document.getElementById('saleAmountPaid').value='';
+  document.getElementById('salePayment').value='full';
+  togglePaidField();
+  renderCart();
+  renderSales();
+  renderItems();
+}
+
+function saleItemsSummary(sale){
+  if(!sale.items || sale.items.length===0) return '';
+  const first = escapeHtml(sale.items[0].itemName);
+  return sale.items.length>1 ? `${first} +${sale.items.length-1} ሌላ` : first;
+}
+
+function renderSales(){
+  const el = document.getElementById('saleList');
+  const list = [...data.sales].sort((a,b)=>b.date.localeCompare(a.date));
+  if(list.length===0){ el.innerHTML = '<div class="empty-note">እስካሁን ምንም ሽያጭ አልተመዘገበም።</div>'; return; }
+  const isOwner = role==='owner';
+  el.innerHTML = `<table class="ledger-table">
+    <tr><th>ቀን</th><th>ዕቃዎች</th><th class="num">ንጥል</th><th class="num">ገቢ</th>${isOwner?'<th class="num">ትርፍ</th>':''}<th>ሁኔታ</th></tr>
+    ${list.map(s=>`<tr>
+      <td class="muted">${s.date}</td>
+      <td>${saleItemsSummary(s)}${s.customerName?`<div class="meta" style="margin-top:2px;">${escapeHtml(s.customerName)}</div>`:''}</td>
+      <td class="num">${s.items?s.items.length:1}</td>
+      <td class="num">${fmt(s.revenue)}</td>
+      ${isOwner?`<td class="num">${fmt(s.profit)}</td>`:''}
+      <td>${s.paymentType==='credit' ? `<span class="pill credit">${s.balance>0?'ዕዳ '+fmt(s.balance):'ተከፍሏል'}</span>` : `<span class="pill paid">ተከፍሏል</span>`}</td>
+    </tr>`).join('')}
+  </table>`;
+}
+
+// ---------- CREDIT ----------
+let payingSaleId = null;
+function openPayModal(saleId){
+  payingSaleId = saleId;
+  document.getElementById('payAmount').value='';
+  document.getElementById('payDate').value = todayStr();
+  document.getElementById('payModalBackdrop').classList.add('active');
+}
+function closePayModal(){
+  document.getElementById('payModalBackdrop').classList.remove('active');
+  payingSaleId=null;
+}
+function submitPayment(){
+  const amt = parseFloat(document.getElementById('payAmount').value);
+  const date = document.getElementById('payDate').value || todayStr();
+  if(!amt || amt<=0){ alert('ትክክለኛ መጠን አስገባ'); return; }
+  const sale = data.sales.find(s=>s.id===payingSaleId);
+  if(!sale) return;
+  sale.payments.push({date, amount:amt});
+  sale.amountPaid += amt;
+  sale.balance = Math.max(sale.revenue - sale.amountPaid, 0);
+  save();
+  closePayModal();
+  renderCredit();
+  renderSales();
+  renderDashboard();
+}
+
+function renderCredit(){
+  const el = document.getElementById('creditList');
+  const outstanding = data.sales.filter(s=>s.paymentType==='credit' && s.balance>0)
+                                  .sort((a,b)=>b.date.localeCompare(a.date));
+  const total = outstanding.reduce((sum,s)=>sum+s.balance,0);
+  document.getElementById('creditTotalTag').textContent = outstanding.length ? `ጠቅላላ ዕዳ ${fmt(total)}` : '';
+  if(outstanding.length===0){ el.innerHTML = '<div class="empty-note">ምንም ያልተከፈለ ብድር የለም። ሁሉም ሽያጭ ተከፍሏል።</div>'; return; }
+  el.innerHTML = outstanding.map(s=>`
+    <div class="item-row">
+      <div>
+        <div class="name">${escapeHtml(s.customerName||'ስም አልተጠቀሰም')}</div>
+        <div class="meta">${saleItemsSummary(s)} · ${s.date} · ከ${fmt(s.revenue)} ውስጥ ${fmt(s.balance)} ይቀራል</div>
+      </div>
+      <div class="row-actions">
+        <button class="small" onclick="openPayModal('${s.id}')">ክፍያ መዝግብ</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---------- DASHBOARD ----------
+function renderDashboard(){
+  const now = new Date();
+  const ym = now.toISOString().slice(0,7);
+  const AM_MONTHS = ['ጃንዩወሪ','ፌብሩወሪ','ማርች','ኤፕሪል','ሜይ','ጁን','ጁላይ','ኦገስት','ሴፕቴምበር','ኦክቶበር','ኖቬምበር','ዲሴምበር'];
+  const monthLabelText = AM_MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+  document.getElementById('monthLabel').textContent = monthLabelText;
+  document.getElementById('monthLabel2').textContent = monthLabelText;
+
+  const monthSales = data.sales.filter(s=>s.date.slice(0,7)===ym);
+  const monthPurchases = data.purchases.filter(p=>p.date.slice(0,7)===ym);
+  const mSalesTotal = monthSales.reduce((s,x)=>s+x.revenue,0);
+  const mProfitTotal = monthSales.reduce((s,x)=>s+x.profit,0);
+  const mPurchaseTotal = monthPurchases.reduce((s,x)=>s+x.total,0);
+  const mMargin = mSalesTotal>0 ? (mProfitTotal/mSalesTotal*100) : 0;
+
+  document.getElementById('mSales').textContent = fmt(mSalesTotal);
+  document.getElementById('mProfit').textContent = fmt(mProfitTotal);
+  document.getElementById('mPurchases').textContent = fmt(mPurchaseTotal);
+  document.getElementById('mMargin').textContent = fmt(mMargin)+'%';
+
+  const tSalesTotal = data.sales.reduce((s,x)=>s+x.revenue,0);
+  const tProfitTotal = data.sales.reduce((s,x)=>s+x.profit,0);
+  const tPurchaseTotal = data.purchases.reduce((s,x)=>s+x.total,0);
+  const tCreditTotal = data.sales.filter(s=>s.paymentType==='credit').reduce((s,x)=>s+x.balance,0);
+
+  document.getElementById('tSales').textContent = fmt(tSalesTotal);
+  document.getElementById('tProfit').textContent = fmt(tProfitTotal);
+  document.getElementById('tPurchases').textContent = fmt(tPurchaseTotal);
+  document.getElementById('tCredit').textContent = fmt(tCreditTotal);
+
+  // quantity sold this month, per item (visible to everyone)
+  const soldByItem = {};
+  monthSales.forEach(s=>{
+    (s.items||[]).forEach(li=>{
+      soldByItem[li.itemId] = soldByItem[li.itemId] || { name: li.itemName, unit: li.unit, qty: 0 };
+      soldByItem[li.itemId].qty += li.qty;
+    });
+  });
+  const soldQtyList = document.getElementById('soldQtyList');
+  const soldEntries = Object.values(soldByItem);
+  if(soldEntries.length===0){
+    soldQtyList.innerHTML = '<div class="empty-note">በዚህ ወር ምንም ሽያጭ የለም።</div>';
+  } else {
+    soldQtyList.innerHTML = soldEntries.map(e=>`
+      <div class="item-row">
+        <div><div class="name">${escapeHtml(e.name)}</div></div>
+        <div class="stockval">${fmt(e.qty)} ${unitLabel(e.unit)}</div>
+      </div>
+    `).join('');
+  }
+
+  const stockValue = data.items.reduce((s,i)=>s+(i.qty*i.avgCost),0);
+  document.getElementById('stockValueTag').textContent = role==='owner' ? ('ዋጋ '+fmt(stockValue)) : '';
+
+  const stockList = document.getElementById('stockList');
+  if(data.items.length===0){
+    stockList.innerHTML = '<div class="empty-note">ገና ዕቃ የለም — ከ«ዕቃዎች» ትር ስር ጨምር።</div>';
+  } else {
+    stockList.innerHTML = data.items.map(it=>`
+      <div class="item-row">
+        <div>
+          <div class="name">${escapeHtml(it.name)}</div>
+          ${role==='owner' ? `<div class="meta">አማካይ ዋጋ ${fmt(it.avgCost)} / ${unitLabel(it.unit)}</div>` : ''}
+        </div>
+        <div class="stockval">
+          ${fmt(it.qty)} ${unitLabel(it.unit)}
+          ${role==='owner' ? `<div class="v">${fmt(it.qty*it.avgCost)}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// ---------- BACKUP ----------
+function exportData(){
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'stock-ledger-backup-'+todayStr()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importData(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(!parsed.items || !parsed.purchases || !parsed.sales) throw new Error('bad format');
+      if(!confirm('ይሄ አሁን ያለውን ውሂብ በምትኬ ፋይሉ ይተካዋል። መቀጠል ትፈልጋለህ?')) return;
+      data = parsed;
+      migrateSalesData();
+      save();
+      populateItemSelects();
+      showView('dashboard');
+    }catch(err){
+      alert('ፋይሉን እንደ ትክክለኛ ምትኬ ማንበብ አልተቻለም።');
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value='';
+}
+
+// ---------- LOGIN / ACCOUNT ----------
+const AUTH_KEY = 'ledgerAuthAccount_v1';
+const SESSION_KEY = 'ledgerAuthLoggedIn_v1';
+
+function getAccount(){
+  try{ return JSON.parse(localStorage.getItem(AUTH_KEY)); }catch(e){ return null; }
+}
+function isLoggedIn(){ return sessionStorage.getItem(SESSION_KEY)==='1' || localStorage.getItem(SESSION_KEY)==='1'; }
+
+function showLoginScreen(){
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('appShell').style.display='none';
+  const acc = getAccount();
+  const submitBtn = document.getElementById('loginSubmitBtn');
+  const hint = document.getElementById('loginHint');
+  if(acc){
+    submitBtn.textContent = 'ግባ';
+    hint.textContent = '';
+    document.getElementById('loginEmail').value = acc.email;
+  } else {
+    submitBtn.textContent = 'መለያ ፍጠር';
+    hint.textContent = 'ለመጀመሪያ ጊዜ እየተጠቀሙ ነው። ኢሜይል እና የይለፍ ቃል አስገብተህ «መለያ ፍጠር» ተጫን — ይህ የመግቢያ መለያህ ይሆናል።';
+  }
+  document.getElementById('loginError').style.display='none';
+}
+
+function showApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='block';
+}
+
+function handleLoginSubmit(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display='none';
+
+  if(!email || !pass){
+    errEl.textContent = 'እባክህ ኢሜይል እና የይለፍ ቃል ሁለቱንም አስገባ።';
+    errEl.style.display='block';
+    return;
+  }
+
+  const acc = getAccount();
+  if(!acc){
+    if(pass.length<4){
+      errEl.textContent = 'የይለፍ ቃል ቢያንስ 4 ፊደል/ቁጥር ሊኖረው ይገባል።';
+      errEl.style.display='block';
+      return;
+    }
+    localStorage.setItem(AUTH_KEY, JSON.stringify({email, password:pass}));
+    localStorage.setItem(SESSION_KEY,'1');
+    showApp();
+    return;
+  }
+
+  if(acc.email.toLowerCase()===email.toLowerCase() && acc.password===pass){
+    localStorage.setItem(SESSION_KEY,'1');
+    showApp();
+  } else {
+    errEl.textContent = 'ኢሜይል ወይም የይለፍ ቃል ትክክል አይደለም።';
+    errEl.style.display='block';
+  }
+}
+
+function handleLogout(){
+  if(!confirm('ከመለያህ መውጣት ትፈልጋለህ?')) return;
+  localStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('loginPassword').value='';
+  showLoginScreen();
+}
+
+// ---------- INIT ----------
+document.getElementById('purchaseDate').value = todayStr();
+document.getElementById('saleDate').value = todayStr();
+populateItemSelects();
+updateRoleUI();
+renderCart();
+if(isLoggedIn()){ showApp(); } else { showLoginScreen(); }
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
